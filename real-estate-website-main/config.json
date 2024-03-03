@@ -1,1 +1,7 @@
-${{ secrets.DB_CONNECTION_INFO }}
+{
+    "DB_USERNAME": "root",
+    "DB_PASSWORD": "damnedKoraline1",
+    "DB_HOST": "localhost",
+    "DB_NAME": "realestate"
+}
+
