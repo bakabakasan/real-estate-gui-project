@@ -15,6 +15,3 @@ def hello_dreamhouse():
 def list_estate():
   estate = load_estate_from_db(engine)
   return jsonify(estate=estate) 
-
-if __name__ == "__main__":
-  app.run(host="0.0.0.0", debug=True) 
