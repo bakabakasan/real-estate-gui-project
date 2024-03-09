@@ -1,4 +1,3 @@
-import json
 from sqlalchemy import create_engine, text
 import os
 
@@ -18,7 +17,7 @@ def create_db_engine():
 
 def load_estate_from_db(engine): 
     with engine.connect() as conn:
-        result = conn.execute(text("select * from estate"))
+        result = conn.execute(text("SELECT * FROM estate"))
         estate = result.fetchall()
     print("Query executed successfully.")
     return estate

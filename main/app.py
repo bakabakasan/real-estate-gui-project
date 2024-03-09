@@ -3,8 +3,7 @@ from database import load_estate_from_db, create_db_engine
 
 app = Flask(__name__)
 
-config_filename = 'config.json'
-engine = create_db_engine(config_filename)
+engine = create_db_engine()
 
 @app.route("/") 
 def hello_dreamhouse(): 
