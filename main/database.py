@@ -9,8 +9,8 @@ def read_config():
     db_name = os.environ.get('DB_NAME')
     return db_username, db_password, db_host, db_name
 
-def create_db_engine(config_filename):
-    db_username, db_password, db_host, db_name = read_config(config_filename)
+def create_db_engine():
+    db_username, db_password, db_host, db_name = read_config()
     db_connection_string = f"mysql+pymysql://{db_username}:{db_password}@{db_host}/{db_name}?charset=utf8mb4"
     engine = create_engine(db_connection_string)
     print("Connected to the database.")
@@ -24,6 +24,5 @@ def load_estate_from_db(engine):
     return estate
 
 # Usage
-config_filename = 'config.json'
-engine = create_db_engine(config_filename)
+engine = create_db_engine()
 estate = load_estate_from_db(engine)
