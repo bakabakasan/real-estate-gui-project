@@ -1,11 +1,20 @@
 from sqlalchemy import create_engine, text
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def read_config():
     db_username = os.environ.get('DB_USERNAME')
     db_password = os.environ.get('DB_PASSWORD')
     db_host = os.environ.get('DB_HOST')
     db_name = os.environ.get('DB_NAME')
+
+    print("DB_USERNAME:", db_username)
+    print("DB_PASSWORD:", db_password)
+    print("DB_HOST:", db_host)
+    print("DB_NAME:", db_name)
+
     return db_username, db_password, db_host, db_name
 
 def create_db_engine():
