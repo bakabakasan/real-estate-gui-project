@@ -1,13 +1,12 @@
 import json
 from sqlalchemy import create_engine, text
+import os
 
-def read_config(filename):
-    with open(filename, 'r') as file:
-        config_data = json.load(file)
-    db_username = config_data['DB_USERNAME']
-    db_password = config_data['DB_PASSWORD']
-    db_host = config_data['DB_HOST']
-    db_name = config_data['DB_NAME']
+def read_config():
+    db_username = os.environ.get('DB_USERNAME')
+    db_password = os.environ.get('DB_PASSWORD')
+    db_host = os.environ.get('DB_HOST')
+    db_name = os.environ.get('DB_NAME')
     return db_username, db_password, db_host, db_name
 
 def create_db_engine(config_filename):
