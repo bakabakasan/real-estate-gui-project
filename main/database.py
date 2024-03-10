@@ -17,9 +17,11 @@ def read_config():
 
     return db_username, db_password, db_host, db_name
 
+from sqlalchemy import create_engine
+
 def create_db_engine():
     db_username, db_password, db_host, db_name = read_config()
-    db_connection_string = f"mysql+pymysql://{db_username}:{db_password}@{db_host}/{db_name}?charset=utf8mb4"
+    db_connection_string = f"postgresql://{db_username}:{db_password}@{db_host}/{db_name}"
     engine = create_engine(db_connection_string)
     print("Connected to the database.")
     return engine
