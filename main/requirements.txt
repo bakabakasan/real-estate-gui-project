@@ -1,6 +1,6 @@
 Flask
 gunicorn
 sqlalchemy
-pymysql
+psycopg2
 python-dotenv
 
