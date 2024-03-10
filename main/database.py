@@ -13,8 +13,7 @@ def read_config():
 
 def create_db_engine():
     db_url = read_config()
-    db_connection_string = f"{db_url}" # corrected interpolation
-    engine = create_engine(db_connection_string)
+    engine = create_engine(db_url)
     print("Connected to the database.")
     return engine
 
