@@ -14,7 +14,7 @@ def read_config():
 
 def create_db_engine():
     db_username, db_password, db_host, db_name = read_config()
-    db_connection_string = f"postgresql://{db_username}:{db_password}@{db_host}/{db_name}"
+    db_connection_string = f"postgresql+psycopg2://{db_username}:{db_password}@{db_host}/{db_name}"
     engine = create_engine(db_connection_string)
     print("Connected to the database.")
     return engine
@@ -28,8 +28,6 @@ def load_estate_from_db(engine):
         # Декодируем данные после извлечения
         return estate
     
-
-
 # Usage
 engine = create_db_engine()
 estate = load_estate_from_db(engine)
