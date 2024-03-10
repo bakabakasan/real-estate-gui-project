@@ -15,9 +15,11 @@ def list_estate():
   estate = load_estate_from_db(engine)
   return jsonify(estate=estate) 
 
-@app.route("/estates/<id>")
+@app.route("/estates/<int:id>")
 def show_estates(id):
-  estates = load_estates_from_db()
+  estates = load_estates_from_db(id)
+  if estates is None:
+    abort(404)
   return jsonify(estates)
 
 if __name__ == "__main__":
