@@ -27,4 +27,3 @@ def load_estate_from_db(engine):
 # Usage
 engine = create_db_engine()
 estate = load_estate_from_db(engine)
-
