@@ -1,5 +1,5 @@
 from flask import Flask, render_template, jsonify 
-from database import load_estate_from_db, create_db_engine
+from database import load_estate_from_db, create_db_engine, load_estates_from_db
 
 app = Flask(__name__)
 
@@ -14,6 +14,11 @@ def hello_dreamhouse():
 def list_estate():
   estate = load_estate_from_db(engine)
   return jsonify(estate=estate) 
+
+@app.route("/estates/<id>")
+def show_estates(id):
+  estates = load_estates_from_db()
+  return jsonify(estates)
 
 if __name__ == "__main__":
   app.run(host="0.0.0.0", debug=True) 
