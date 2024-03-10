@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify 
+from flask import Flask, render_template, jsonify, abort 
 from database import load_estate_from_db, create_db_engine, load_estates_from_db
 
 app = Flask(__name__)
