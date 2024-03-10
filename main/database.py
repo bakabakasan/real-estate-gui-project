@@ -23,7 +23,7 @@ def load_estate_from_db(engine):
     try:
         with engine.connect() as conn:
             result = conn.execute(text("SELECT * FROM estate"))
-            estate = result.fetchall()
+            estate = result.fetchall().decode('utf-8')
         print("Query executed successfully.")
         return estate
     except UnicodeDecodeError as e:
