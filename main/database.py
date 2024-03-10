@@ -23,13 +23,17 @@ def load_estate_from_db(engine):
     try:
         with engine.connect() as conn:
             result = conn.execute(text("SELECT * FROM estate"))
-            estate = result.fetchall().decode('utf-8')
-        print("Query executed successfully.")
+            # Указываем кодировку символов
+            estate = result.fetchall()
+        print("Запрос выполнен успешно.")
+        # Декодируем данные после извлечения
+        estate = [row.decode('utf-8') for row in estate]
         return estate
     except UnicodeDecodeError as e:
-        print("Error decoding data:", e)
-        # Handle the error gracefully, e.g., log it or skip the problematic data.
+        print("Ошибка декодирования данных:", e)
+        # Обрабатываем ошибку, например, регистрируем ее или пропускаем проблемные данные.
         return None
+
 
 # Usage
 engine = create_db_engine()
