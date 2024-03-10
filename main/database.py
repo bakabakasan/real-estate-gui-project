@@ -5,23 +5,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def read_config():
-    db_username = os.environ.get('DB_USERNAME')
-    db_password = os.environ.get('DB_PASSWORD')
-    db_host = os.environ.get('DB_HOST')
-    db_name = os.environ.get('DB_NAME')
+    db_url = os.environ.get('DB_URL')
 
-    print("DB_USERNAME:", db_username)
-    print("DB_PASSWORD:", db_password)
-    print("DB_HOST:", db_host)
-    print("DB_NAME:", db_name)
+    print("DB_URL:", db_url)
 
-    return db_username, db_password, db_host, db_name
-
-from sqlalchemy import create_engine
+    return db_url
 
 def create_db_engine():
-    db_username, db_password, db_host, db_name = read_config()
-    db_connection_string = f"postgresql://{db_username}:{db_password}@{db_host}/{db_name}"
+    db_url = read_config()
+    db_connection_string = f"{db_url}" # corrected interpolation
     engine = create_engine(db_connection_string)
     print("Connected to the database.")
     return engine
