@@ -2,6 +2,8 @@ from sqlalchemy import create_engine, text
 import os
 from dotenv import load_dotenv
 
+
+
 load_dotenv()
 
 def read_config():
@@ -24,7 +26,7 @@ def load_estate_from_db(engine):
             result = conn.execute(text("SELECT * FROM estate"))
             # Указываем кодировку символов
             estate = result.fetchall()
-        print("Запрос выполнен успешно.")
+        print("Query executed successfully.")
         # Декодируем данные после извлечения
         return estate
     
