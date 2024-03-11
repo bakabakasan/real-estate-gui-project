@@ -32,3 +32,14 @@ def load_estate_from_db(engine):
 engine = create_db_engine()
 estate = load_estate_from_db(engine)
 
+def load_estates_from_db(id):
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("SELECT * FROM ESTATE WHERE id = :val"),
+            val=id
+        )
+        rows = result.all()
+        if len(rows) == 0:
+            return None
+        else:
+            return dict(rows[0])
