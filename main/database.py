@@ -20,13 +20,12 @@ def create_db_engine():
     return engine
 
 def load_estate_from_db(engine): 
-        with engine.connect() as conn:
-            result = conn.execute(text("SELECT * FROM estate"))
-            # Указываем кодировку символов
-            estate = result.fetchall()
-        print("Query executed successfully.")
-        # Декодируем данные после извлечения
-        return estate
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT * FROM estate"))
+        column_names = result.keys()  # Получаем имена столбцов
+        estate = [dict(zip(column_names, row)) for row in result.fetchall()]
+    print("Query executed successfully.")
+    return estate
     
 # Usage
 engine = create_db_engine()
