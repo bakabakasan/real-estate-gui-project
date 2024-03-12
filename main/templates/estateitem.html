@@ -6,11 +6,11 @@
     <div>
       <b>Местоположение:</b> {{estate['location']}} 
     </div>
-    {% if 'cost' in estate %}
+    {% if estate['cost'] is not none %}
     <div>
       <b>Стоимость:</b> {{estate['cost']}} {{estate['currency']}} 
     </div>
-     {% endif %} 
+    {% endif %} 
     <div>
       <b>Комнаты:</b> {{estate['rooms']}} 
     </div>

@@ -16,7 +16,7 @@
   </head>
   <body>
      {% include 'nav.html' %}
-    <img lass="img-fluid" id="banner" class="img" id="banner" src=" https://be1d409b-13ef-402f-aa88-95067d77a4ec-00-34vk0er2yljbi.janeway.replit.dev/static/banner.jpg">
+    <img lass="img-fluid" id="banner" class="img" id="banner" src="/static/banner.jpg">
     <div class="container">
       <h1 class="text-center mt-2 mb-4">DreamHouse</h1>
       <div class="row" style="margin-bottom:16px"> 
@@ -36,7 +36,7 @@
       </h2>
       </div>
         <div>
-          {% for estate_item in estate %}
+          {% for estate in estate %}
              {% include 'estateitem.html'%}
           {% endfor%}
         </div>

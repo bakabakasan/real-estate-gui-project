@@ -12,8 +12,8 @@ def hello_dreamhouse():
 
 @app.route("/api/estate")
 def list_estate():
-  estate = load_estate_from_db(engine)
-  return jsonify(estate=estate) 
+  estates = load_estate_from_db(engine)
+  return jsonify(estate=estates) 
 
 def show_estates(id):
   estates = load_estates_from_db(id)
