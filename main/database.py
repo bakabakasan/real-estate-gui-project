@@ -41,5 +41,4 @@ def load_estates_from_db(id):
         rows = result.all()
         if len(rows) == 0:
             return None
-        else:
-            return dict(rows[0])
+    

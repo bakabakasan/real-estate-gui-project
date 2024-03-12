@@ -18,8 +18,6 @@ def list_estate():
 @app.route("/estateitem")
 def show_estates(id):
   estates = load_estates_from_db(id)
-  if estates is None:
-    abort(404)
   return jsonify(estates)
 
 if __name__ == "__main__":
