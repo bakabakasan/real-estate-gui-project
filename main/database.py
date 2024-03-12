@@ -35,12 +35,14 @@ estate = load_estate_from_db(engine)
 def load_estateitem_from_db(id):
     with engine.connect() as conn:
         result = conn.execute(
-            text("SELECT * FROM ESTATE WHERE id = :val"),
-            val=id
+            text("SELECT * FROM ESTATE WHERE id = :id"),
+            {"id": id}
         )
         rows = result.fetchall()
         if len(rows) == 0:
             return None
         else:
-             return dict(rows[0])
+            keys = result.keys()  # Получаем имена столбцов
+            row_dict = dict(zip(keys, rows[0]))  # Создаем словарь из кортежа значений
+            return row_dict
     
