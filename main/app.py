@@ -15,6 +15,7 @@ def list_estate():
   estates = load_estate_from_db(engine)
   return jsonify(estate=estates) 
 
+@app.route("/api/estateitem")
 def show_estates(id):
   estates = load_estates_from_db(id)
   if estates is None:
