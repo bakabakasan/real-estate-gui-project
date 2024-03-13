@@ -18,10 +18,18 @@ def list_estate():
 @app.route("/estateitem/<id>")
 def show_estate(id):
   estate_item = load_estateitem_from_db(id)
-  if estate_item is None:  # Added a check for None to handle the case when no item is found
-        return jsonify(error="No estate item found for the given ID"), 404
-  else:
-        return jsonify(estate_item)
+  if not estate_item:
+    return "Not Found", 404
+  
+  return render_template('estatepage.html', estate=estate_item)
+
+@app.route("/contacts") 
+def contact_details(): 
+  return render_template('contacts.html')
+
+@app.route("/about-us") 
+def about_company(): 
+  return render_template('aboutus.html')
 
 if __name__ == "__main__":
   app.run(host="0.0.0.0", debug=True) 
