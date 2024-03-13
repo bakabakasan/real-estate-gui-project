@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% include 'bootstrap.html' %}
+</head>
+
+<body>
+    {% include 'nav.html' %}
+    {% include 'banner.html' %}
+    <div class="container">
+        <h1 class="text-center mt-2 mb-4">DreamHouse</h1>
+        <p>Ваше сообщение было отправлено!</p>
+
+        <b>Имя</b>
+        <div class="mb-2">{{message['full_name']}}</div>
+
+        <b>Номер телефона</b>
+        <div class="mb-2">{{message['phone_number']}}</div>
+
+        <b>E-mail</b>
+        <div class="mb-2">{{message['e-mail']}}</div>
+
+        <b>Что вас интересует?</b>
+        <div class="mb-2">{{message['message']}}</div>
+
+        <p>Спасибо, что обратились к нам! Наши менеджеры свяжутся с Вами в течении 24 часов.</p>
+    </div>
+    {% include 'footer.html' %}
+</body>
+
+</html>
