@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, text
 import os
 from dotenv import load_dotenv
+from sqlalchemy.exc import SQLAlchemyError
 
 load_dotenv()
 
@@ -20,13 +21,15 @@ def create_db_engine():
     return engine
     
 def load_estate_from_db(engine): 
+    try:
         with engine.connect() as conn:
             result = conn.execute(text("SELECT * FROM estate"))
-            # Указываем кодировку символов
             estates = result.fetchall()
         print("Query executed successfully.")
-        # Декодируем данные после извлечения
         return estates
+    except SQLAlchemyError as e:
+        print("An error occurred while executing the query:", str(e))
+        return None
 
 # Usage
 engine = create_db_engine()
@@ -45,4 +48,21 @@ def load_estateitem_from_db(id):
             keys = result.keys()  # Получаем имена столбцов
             row_dict = dict(zip(keys, rows[0]))  # Создаем словарь из кортежа значений
             return row_dict
-    
+        
+def add_message_to_db(page_url, data):
+    try:
+        with engine.connect() as conn:
+            query = text("""
+                INSERT INTO messages(full_name, phone_number, email, message, page_url) 
+                VALUES(:full_name, :phone_number, :email, :message, :page_url)
+            """)
+            conn.execute(query, {
+                'full_name': data['full_name'], 
+                'phone_number': data['phone_number'], 
+                'email': data['email'], 
+                'message': data['message'], 
+                'page_url': page_url
+            })
+        print("Message added to the database successfully.")
+    except SQLAlchemyError as e:
+        print("An error occurred while adding the message to the database:", str(e))
