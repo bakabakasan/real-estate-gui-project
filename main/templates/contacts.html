@@ -10,7 +10,19 @@
     {% include 'banner.html' %}
     <div class="container">
         <h1 class="text-center mt-2 mb-4">DreamHouse</h1>
-        {% include 'contactusform.html' %}
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Информация о компании:</h2>
+                <p><strong>Адрес офиса:</strong> ул. Серафимовича, 4(ст.м. Пролетарская), Минск, Беларусь</p>
+                <p><strong>Название компании:</strong> DreamHouse</p>
+                <p><strong>Телефон:</strong> +375 (29) 123-45-67</p> 
+                <p><strong>Email:</strong> info@dreamhouse.by</p>
+            </div>
+            <div class="col-md-6">
+                <h2>Свяжитесь с нами</h2>
+                {% include 'contactusform.html' %}
+            </div>
+        </div>
     </div>
     {% include 'footer.html' %}
 </body>

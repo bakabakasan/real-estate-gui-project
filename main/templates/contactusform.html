@@ -1,27 +1,33 @@
-<div class="text-center">
-<h4>Связаться с нами</h4>
-<form action="/sent-message" method="post">
-    <div class="mb-2">
-        <label>Имя</label><br>
-        <input type="text" name="full_name" placeholder="Иванов Иван">
+<div class="container" style="background-color: #f0f8ff; padding: 20px;">
+    <h4 class="text-center mb-4">Свяжитесь с нами</h4>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form action="/sent-message" method="post">
+                <div class="form-group">
+                    <label for="full_name"></label>
+                    <input type="text" class="form-control" id="full_name" name="full_name" placeholder="Имя">
+                </div>
+                <div class="form-group">
+                    <label for="phone_number"></label>
+                    <input type="text" class="form-control" id="phone_number" name="phone_number"
+                        placeholder="Телефон">
+                </div>
+                <div class="form-group">
+                    <label for="e-mail"></label>
+                    <input type="text" class="form-control" id="e-mail" name="e-mail"
+                        placeholder="E-mail">
+                </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group mb-4">
+                <label for="message"></label>
+                <textarea class="form-control" id="message" name="message"
+                    placeholder="Что вас интересует?"></textarea>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary" style="background-color: #4682b4;">Отправить</button>
+            </div>
+            </form>
+        </div>
     </div>
-    
-    <div class="mb-2">
-        <label>Номер телефона</label><br>
-        <input type="text" name="phone_number" placeholder="+375292223344">
-    
-    <div class="mb-2">
-        <label>E-mail</label><br>
-        <input type="text" name="e-mail" placeholder="ivanovivan@dreamhouse.by">
-    </div>
-
-    <div class="mb-2">
-        <label>Что вас интересует?</label><br>
-        <textarea name="message" placeholder="Рассматриваю варианты квартир в центре Минска..."></textarea>
-    </div>
-
-    <div class="mb-2">
-       <input type="submit"> 
-    </div>
-</form>
 </div>
