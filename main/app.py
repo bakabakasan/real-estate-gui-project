@@ -21,7 +21,7 @@ def list_estate():
     except Exception as e:
         return jsonify(error=str(e)), 500
     
-@app.route("/estate-item/<id>")
+@app.route("/estateitem/<id>")
 def show_estate(id):
   estate_item = load_estateitem_from_db(id)
   if not estate_item:
@@ -49,12 +49,6 @@ def contact_details():
 def about_company(): 
   return render_template('aboutus.html')
 
-def check_referrer():
-    referrer = request.referrer
-    if referrer:
-        return f"Referrer URL: {referrer}"
-    else:
-        return "Referrer URL is None"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
