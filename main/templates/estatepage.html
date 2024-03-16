@@ -4,26 +4,58 @@
 <head>
     <title>{{estate.type}} - DreamHouse</title>
     {% include 'bootstrap.html' %}   
+    <style>
+        .photos {
+            /* Стили для области с фотографиями */
+            /* Добавьте свои стили здесь */
+        }
+
+        .contact-form {
+            /* Стили для формы свяжитесь с нами */
+            /* Добавьте свои стили здесь */
+        }
+
+        .estate-info {
+            /* Стили для области с информацией о недвижимости */
+            /* Добавьте свои стили здесь */
+        }
+    </style>
 </head>
 
-    <body>
-        {% include 'nav.html' %}
-        {% include 'banner.html' %}
-        <div class="container">
+<body>
+    {% include 'nav.html' %}
+    {% include 'banner.html' %}
+    <div class="container">
         <h1 class="text-center mt-2 mb-4">DreamHouse</h1>
-            <h3 class="mb-2">{{estate.type}}</h3>
-            <p class="lead mt-0">{{estate.location}}</p>
-            <h4>Стоимость</h4>
-            <p>{{estate.cost}} {{estate.currency}}</p>
-            <h4>Комнаты</h4>
-            <p>{{estate.rooms}}</p>
-            <h4>Описание</h4>
-            <p>{{estate.description}}</p>
-            <h4>Дополнительная информация</h4>
-            <p>{{estate.additional_information}}</p>
-            {% include 'contactusform.html' %}
+        <div class="row">
+            <div class="col-md-8">
+                <div class="photos">
+                    <!-- Область с фотографиями -->
+                    <!-- Добавьте ваш код для фотографий здесь -->
+                </div>
+                <div class="estate-info">
+                    <h3 class="mb-2">{{estate.type}}</h3>
+                    <p class="lead mt-0">{{estate.location}}</p>
+                    <h4>Стоимость</h4>
+                    <p>{{estate.cost}} {{estate.currency}}</p>
+                    <h4>Комнаты</h4>
+                    <p>{{estate.rooms}}</p>
+                    <h4>Описание</h4>
+                    <p>{{estate.description}}</p>
+                    <h4>Дополнительная информация</h4>
+                    <p>{{estate.additional_information}}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="contact-form">
+                    <!-- Форма свяжитесь с нами -->
+                    <!-- Добавьте вашу форму здесь -->
+                    {% include 'contactusform.html' %}
+                </div>
+            </div>
+        </div>
     </div>
-        {% include 'footer.html' %}
-    </body>
-        
+    {% include 'footer.html' %}
+</body>
+
 </html>
