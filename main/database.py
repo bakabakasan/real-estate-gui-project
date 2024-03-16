@@ -24,13 +24,22 @@ def load_estate_from_db(engine):
     try:
         with engine.connect() as conn:
             result = conn.execute(text("SELECT * FROM estate"))
-            estates = result.fetchall()
+            rows = result.fetchall()
+            print("Fetched rows from the database:", rows)  # Debug output
+            
+            # Convert rows to dictionaries
+            estates = []
+            for row in rows:
+                estate_dict = {}
+                for column, value in zip(result.keys(), row):
+                    estate_dict[column] = value
+                estates.append(estate_dict)
+                
         print("Query executed successfully.")
         return estates
     except SQLAlchemyError as e:
         print("An error occurred while executing the query:", str(e))
         return None
-
 # Usage
 engine = create_db_engine()
 estate = load_estate_from_db(engine)
