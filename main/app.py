@@ -26,7 +26,6 @@ def show_estate(id):
   estate_item = load_estateitem_from_db(id)
   if not estate_item:
     return "Not Found", 404
-  
   return render_template('estatepage.html', 
                          estate=estate_item)
 
@@ -35,7 +34,7 @@ def fill_in_the_form():
     try:
         data = request.form
         page_url = request.referrer
-        print("Referrer URL:", page_url)  # Добавляем эту строку для отладки
+        print("Referrer URL:", page_url) 
         add_message_to_db(page_url, data)
         return render_template('sent_message.html', message=data)
     except Exception as e:
@@ -48,7 +47,6 @@ def contact_details():
 @app.route("/about-us") 
 def about_company(): 
   return render_template('aboutus.html')
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

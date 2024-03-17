@@ -63,13 +63,12 @@ def add_message_to_db(page_url, data):
         with engine.connect() as conn:
             query = text("""
                 INSERT INTO messages(full_name, phone_number, email, message, page_url) 
-                VALUES(:full_name, :phone_number, :email, :message, :page_url)
-            """)
+                VALUES(:full_name, :phone_number, :email, :message, :page_url)""")
             conn.execute(query, {
-                'full_name': data['full_name'], 
-                'phone_number': data['phone_number'], 
-                'email': data['email'], 
-                'message': data['message'], 
+                'full_name': data.get('full_name', ''),  
+                'phone_number': data.get('phone_number', ''),  
+                'email': data.get('email', ''),  
+                'message': data.get('message', ''),  
                 'page_url': page_url
             })
         print("Message added to the database successfully.")

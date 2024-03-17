@@ -1,0 +1,26 @@
+<div class="row justify-content-center mb-4">
+    <div class="col-md-8"> <!-- Увеличиваем ширину формы -->
+        <form class="d-flex" role="search" action="/search" method="GET">
+            <div class="input-group">
+                <input class="form-control" type="search" name="query" placeholder="Поиск" aria-label="Search"
+                    autofocus>
+                <!-- Добавляем атрибут autofocus, чтобы поле поиска автоматически получило фокус при загрузке страницы -->
+                <select class="form-select" name="rooms">
+                    <option value="">Комнаты</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5 и более</option>
+                </select>
+                <select class="form-select" name="type">
+                    <option value="">Дом или квартира?</option>
+                    <option value="Дом">Дом</option>
+                    <option value="Квартира">Квартира</option>
+                </select>
+                <button class="btn btn-secondary" type="submit">Поиск</button>
+                <!-- Изменим класс кнопки на btn-secondary для изменения цвета на более тёмный и приглушённый -->
+            </div>
+        </form>
+    </div>
+</div>
