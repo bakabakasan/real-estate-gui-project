@@ -6,14 +6,14 @@
     <div>
       <b>Местоположение:</b> {{estate['location']}} 
     </div>
+    <div>
+      <b>Комнаты:</b> {{estate['rooms']}}
+    </div>
     {% if estate['cost'] is not none %}
     <div>
       <b>Стоимость:</b> {{estate['cost']}} {{estate['currency']}} 
     </div>
     {% endif %} 
-    <div>
-      <b>Комнаты:</b> {{estate['rooms']}}
-    </div>
     </div>
     <div class="col-2">
         <a href="/estateitem/{{estate['id']}}" type="button" class="btn btn-outline-primary">Подробнее</a>
