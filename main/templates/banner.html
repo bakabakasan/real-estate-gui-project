@@ -1,9 +1,34 @@
 <style>
-    #banner {
+    #banner-container {
+        position: relative;
         height: 360px;
         width: 100%;
-        object-fit: cover;
         margin-bottom: 16px;
     }
+
+    #banner {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    #banner-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #88a4f9;;
+        /* Измененный цвет заголовка */
+        font-size: 90px;
+        /* Увеличенный размер заголовка */
+        font-weight: bold;
+        text-align: center;
+        z-index: 1;
+        /* Чтобы заголовок был поверх изображения */
+    }
 </style>
-<img class="img-fluid" id="banner" class="img" id="banner" src="/static/banner.jpg">
+
+<div id="banner-container">
+    <img class="img-fluid" id="banner" src="/static/banner.jpg" alt="Banner Image">
+    <h1 id="banner-text">DreamHouse</h1>
+</div>

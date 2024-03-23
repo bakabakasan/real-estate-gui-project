@@ -9,20 +9,19 @@
     {% include 'nav.html' %}
     {% include 'banner.html' %}
     <div class="container">
-        <h1 class="text-center mt-2 mb-4">DreamHouse</h1>
-        <p>Ваше сообщение было отправлено!</p>
+        <h1 class="text-center mt-2 mb-4">Ваше сообщение было отправлено!</h1>
 
         <b>Имя</b>
-        <div class="mb-2">{{message['full_name']}}</div>
+        <div class="mb-2">{{data.full_name}}</div>
 
         <b>Номер телефона</b>
-        <div class="mb-2">{{message['phone_number']}}</div>
+        <div class="mb-2">{{data.phone_number}}</div>
 
         <b>E-mail</b>
-        <div class="mb-2">{{message['email']}}</div>
+        <div class="mb-2">{{data.email}}</div>
 
         <b>Что вас интересует?</b>
-        <div class="mb-2">{{message['message']}}</div>
+        <div class="mb-2">{{data.message}}</div>
 
         <p>Спасибо, что обратились к нам! Наши менеджеры свяжутся с Вами в течении 24 часов.</p>
     </div>
