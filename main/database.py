@@ -1,8 +1,21 @@
 from sqlalchemy import create_engine, text
+import os
+from dotenv import load_dotenv
 from sqlalchemy.exc import SQLAlchemyError
 
+load_dotenv() 
+
+def read_config():
+    db_username = os.environ.get('DB_USERNAME')
+    db_password = os.environ.get('DB_PASSWORD')
+    db_host = os.environ.get('DB_HOST')
+    db_name = os.environ.get('DB_NAME')
+
+    return db_username, db_password, db_host, db_name
+
 def create_db_engine():
-    db_connection_string = "sqlite:///database.db"
+    db_username, db_password, db_host, db_name = read_config()
+    db_connection_string = f"postgresql+psycopg2://{db_username}:{db_password}@{db_host}/{db_name}?client_encoding=utf8"
     engine = create_engine(db_connection_string)
     print("Connected to the database.")
     return engine
@@ -44,17 +57,19 @@ def add_message_to_db(page_url, data):
             query = text("""
                 INSERT INTO messages(full_name, phone_number, email, message, page_url) 
                 VALUES(:full_name, :phone_number, :email, :message, :page_url)""")
-            conn.execute(query, {
-                'full_name': data.get('full_name', ''),  
-                'phone_number': data.get('phone_number', ''),  
-                'email': data.get('email', ''),  
-                'message': data.get('message', ''),  
-                'page_url': page_url
-            })
-        print("Message added to the database successfully.")
+            if all(key in data for key in ['full_name', 'phone_number', 'email', 'message']):
+                conn.execute(query, {
+                    'full_name': data.get('full_name', ''),  
+                    'phone_number': data.get('phone_number', ''),  
+                    'email': data.get('email', ''),  
+                    'message': data.get('message', ''),  
+                    'page_url': page_url
+                })
+            else:
+                print("Отсутствуют обязательные поля в данных.")
     except SQLAlchemyError as e:
         print("An error occurred while adding the message to the database:", str(e))
-        raise  # Re-raise the exception for handling in Flask view
+        raise
 
 def register_form(name, email, password):
     try:

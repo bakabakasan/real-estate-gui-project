@@ -60,8 +60,6 @@ def register():
                 return render_template('error.html', error='Please fill out all fields'), 400
             
             register_form(name, email, password)
-
-            return redirect('/login')
         
         return render_template('register.html') 
     except Exception as e:
