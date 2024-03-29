@@ -5,32 +5,26 @@ from sqlalchemy import text
 import os
 from dotenv import load_dotenv
 
+load_dotenv() 
 app = Flask(__name__)
 
-load_dotenv() 
+db_host = os.environ.get('DB_HOST')
+db_name = os.environ.get('DB_NAME')
+db_password = os.environ.get('DB_PASSWORD')
+db_username = os.environ.get('DB_USERNAME')
+app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://{db_username}:{db_password}@{db_host}/{db_name}"
+
 db = SQLAlchemy()
-
-def read_config():
-    db_username = os.environ.get('DB_USERNAME')
-    db_password = os.environ.get('DB_PASSWORD')
-    db_host = os.environ.get('DB_HOST')
-    db_name = os.environ.get('DB_NAME')
-
-    return db_username, db_password, db_host, db_name
-
-def init_db(app):
-    ENV = 'dev'
-    db_username, db_password, db_host, db_name = read_config()
-    
-    if ENV == 'dev':
-        app.debug = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://{db_username}:{db_password}@{db_host}/{db_name}?client_encoding=utf8"
-    else:
-        app.debug = False
-        app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://{db_username}:{db_password}@{db_host}/{db_name}?client_encoding=utf8"
-        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+app.app_context().push()
 db.init_app(app)
+
+try:
+        db.session.execute(text("SELECT 1"))
+        print("Соединение с базой данных успешно установлено.")
+        db.create_all()
+        print("Таблицы успешно созданы.")
+except SQLAlchemyError as e:
+    print("Ошибка при соединении с базой данных:", str(e))
 
 class Estate(db.Model):
     __tablename__ = 'estate'
@@ -97,6 +91,7 @@ def hello_dreamhouse():
         return render_template('home.html', estate=estate) 
     except Exception as e:
         return render_template('error.html', error=str(e)), 500
+
 
 def load_estate_from_db(): 
     try:
