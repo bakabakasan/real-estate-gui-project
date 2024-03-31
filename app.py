@@ -4,6 +4,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import text
 import os
 from dotenv import load_dotenv
+from flask_admin import Admin, AdminIndexView, form
+from flask_admin.contrib.sqla import ModelView
+from flask_login import UserMixin, LoginManager, current_user, login_user, logout_user, login_required
 
 load_dotenv() 
 app = Flask(__name__)
@@ -13,10 +16,13 @@ db_name = os.environ.get('DB_NAME')
 db_password = os.environ.get('DB_PASSWORD')
 db_username = os.environ.get('DB_USERNAME')
 app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://{db_username}:{db_password}@{db_host}/{db_name}"
+app.config["SECRET_KEY"] = "mysecret"
 
-db = SQLAlchemy()
+db = SQLAlchemy(app)
 app.app_context().push()
-db.init_app(app)
+admin = Admin(app)
+login = LoginManager(app) 
+login.init_app(app)
 
 try:
         db.session.execute(text("SELECT 1"))
@@ -39,8 +45,9 @@ class Estate(db.Model):
     floor = db.Column(db.String(20))
     description = db.Column(db.Text())
     additional_information = db.Column(db.Text())
+    photo = db.Column(db.Text())
 
-    def __init__(self, type, location, cost=0.0, currency='USD', bedrooms=None, area=None, floor=None, description=None, additional_information=None):
+    def __init__(self, type, location, cost=0.0, currency='USD', bedrooms=None, area=None, floor=None, description=None, additional_information=None, photo=None):
         self.type = type
         self.location = location
         self.cost = cost
@@ -50,7 +57,22 @@ class Estate(db.Model):
         self.floor = floor
         self.description = description
         self.additional_information = additional_information
+        self.photo = photo
 
+class FilesModelView(ModelView):
+    form_overrides = {
+        'photo': form.FileUploadField
+    }
+    form_args = {
+        'photo': {
+            'label': 'Photo',
+            'base_path': '/static/photos',
+            'allow_overwrite': False
+        }
+    }
+
+admin.add_view(FilesModelView(Estate, db.session, endpoint='files_model_view_estate'))
+               
 class Message(db.Model):
     __tablename__ = 'messages'
 
@@ -71,27 +93,65 @@ class Message(db.Model):
     def save_to_database(self):
         pass
     
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(60))
     email = db.Column(db.String(30))
-    password = db.Column(db.String(10))
+    password = db.Column(db.String(128))
 
     def __init__(self, name, email, password):
         self.name = name
         self.email = email
         self.password = password
 
+        def __self__(self):
+            return self.name
+        
+@login.user_loader
+def load_user(user_id):
+    user = User.query.get(user_id)
+    if user:
+        return user
+    else:
+        return None
+
+admin.add_view(ModelView(User, db.session))
+admin.add_view(ModelView(Message, db.session))
+
+class MyModelView(ModelView):
+    def is_accessible(self):
+        return current_user.is_authenticated
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('login'))
+    
+class MyAdminIndexView(AdminIndexView):
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+@app.route("/login")
+def login():
+    return render_template('login.html')
+ 
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return 'Вы вышли из аккаунта!'
+
+@app.route("/home")
+@login_required
+def home():
+    return 'Администратор - ' + current_user.email
+
 @app.route("/") 
 def hello_dreamhouse(): 
     try:
-        estate = load_estate_from_db()
+        estate = Estate.query.all()
         return render_template('home.html', estate=estate) 
     except Exception as e:
         return render_template('error.html', error=str(e)), 500
-
 
 def load_estate_from_db(): 
     try:
@@ -99,7 +159,6 @@ def load_estate_from_db():
             result = db.session.execute(text("SELECT * FROM estate"))
             rows = result.fetchall()
             db.session.close()
-            print("Fetched rows from the database:", rows)  # Debug output 
             print("Query executed successfully.")
             return rows
     except SQLAlchemyError as e:
@@ -109,21 +168,21 @@ def load_estate_from_db():
 @app.route("/api/estate")
 def list_estate():
     try:
-        estates = load_estate_from_db()
+        estates = Estate.query.all()
         return jsonify(estate=estates)
     except Exception as e:
         return jsonify(error=str(e)), 500
     
 @app.route("/estateitem/<id>")
 def show_estate(id):
-    estate_item = load_estateitem_from_db(id)
+    estate_item = Estate.query.get(id)
     if not estate_item:
         return "Not Found", 404
     return render_template('estatepage.html', estate=estate_item)
 
 def load_estateitem_from_db(id):
     try:
-        estate_item = Estate.query.filter_by(id=id).first()
+        estate_item = Estate.query.get(id=id).first()
         if estate_item:
             return {
                "id": estate_item.id, 
@@ -179,64 +238,6 @@ def contact_details():
 @app.route("/about-us") 
 def about_company(): 
     return render_template('aboutus.html')
-
-@app.route("/register", methods=['GET', 'POST']) 
-def register(): 
-    try:
-        if request.method == 'POST':
-            name = request.form.get('name')
-            email = request.form.get('email')
-            password = request.form.get('password')
-            
-            if not name or not email or not password:
-                return render_template('error.html', error='Please fill out all fields'), 400
-            
-            register_form(name, email, password)
-        
-        return render_template('register.html') 
-    except Exception as e:
-        return render_template('error.html', error=str(e)), 500
-
-def register_form(name, email, password):
-    try:
-        user = User(name=name, email=email, password=password)
-        db.session.add(user)
-        db.session.commit()
-        print("User was added to the database successfully.")
-    except SQLAlchemyError as e:
-        print("An error occurred while adding the user to the database:", str(e))
-        db.session.rollback()
-        return None
-    
-@app.route("/login", methods=['GET', 'POST']) 
-def login():
-    try:
-        if request.method == 'POST':
-            email = request.form['email']
-            password = request.form['password']
-
-            # Проверяем аутентификацию пользователя
-            if authenticate_user(email, password):
-                # Если аутентификация успешна, устанавливаем сессию для пользователя
-                return redirect('/')
-            else:
-                # Если аутентификация не удалась, возвращаем сообщение об ошибке на страницу входа
-                return render_template('login.html', error='Invalid email or password')
-
-        return render_template('login.html')
-    except Exception as e:
-        return render_template('error.html', error=str(e)), 500  
-
-def authenticate_user(email, password):
-    try:
-        user = User.query.filter_by(email=email, password=password).first()
-        if user:
-            return True
-        else:
-            return False
-    except SQLAlchemyError as e:
-        print("An error occurred while authenticating user:", str(e))
-        return None
     
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
