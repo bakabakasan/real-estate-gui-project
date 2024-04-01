@@ -1,5 +1,17 @@
 {% extends 'admin/master.html' %}
 
+{% block head %}
+{{ super() }}
+<link rel="shortcut icon" href="/static/logo.svg">
+{% endblock %}
+
 {% block body %}
-<h1>Страница Администратора</h1>
+<div class="container">
+    <h1 class="text-center mt-2 mb-4">Страница Администратора</h1>
+    <div class="row justify-content-center">
+        <h2>Добро пожаловать!</h2>
+    </div>
+</div>
+<a href="/" class="btn btn-outline-primary">Вернуться на главную страницу DreamHouse</a>
+<a href="/logout" class="btn btn-secondary" style="position: absolute; top: 10px; right: 10px;">Выйти</a>
 {% endblock %}

@@ -1,12 +1,14 @@
-from flask import Flask, render_template, jsonify, request, redirect, current_app
+from flask import Flask, render_template, jsonify, request, redirect, current_app, url_for, session, abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import text
 import os
 from dotenv import load_dotenv
-from flask_admin import Admin, AdminIndexView, form
+from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
-from flask_login import UserMixin, LoginManager, current_user, login_user, logout_user, login_required
+from wtforms import PasswordField, EmailField
+from flask_admin.form import FileUploadField
+from wtforms.validators import InputRequired
 
 load_dotenv() 
 app = Flask(__name__)
@@ -20,9 +22,6 @@ app.config["SECRET_KEY"] = "mysecret"
 
 db = SQLAlchemy(app)
 app.app_context().push()
-admin = Admin(app)
-login = LoginManager(app) 
-login.init_app(app)
 
 try:
         db.session.execute(text("SELECT 1"))
@@ -31,6 +30,8 @@ try:
         print("Таблицы успешно созданы.")
 except SQLAlchemyError as e:
     print("Ошибка при соединении с базой данных:", str(e))
+
+admin = Admin(app, name="DreamHouse", template_mode="bootstrap3")
 
 class Estate(db.Model):
     __tablename__ = 'estate'
@@ -59,20 +60,11 @@ class Estate(db.Model):
         self.additional_information = additional_information
         self.photo = photo
 
-class FilesModelView(ModelView):
-    form_overrides = {
-        'photo': form.FileUploadField
+class EstateAdminView(ModelView):
+    form_extra_fields = {
+        'photo': FileUploadField('Photos', base_path='static/uploads/')
     }
-    form_args = {
-        'photo': {
-            'label': 'Photo',
-            'base_path': '/static/photos',
-            'allow_overwrite': False
-        }
-    }
-
-admin.add_view(FilesModelView(Estate, db.session, endpoint='files_model_view_estate'))
-               
+              
 class Message(db.Model):
     __tablename__ = 'messages'
 
@@ -93,7 +85,7 @@ class Message(db.Model):
     def save_to_database(self):
         pass
     
-class User(UserMixin, db.Model):
+class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -106,44 +98,45 @@ class User(UserMixin, db.Model):
         self.email = email
         self.password = password
 
-        def __self__(self):
-            return self.name
-        
-@login.user_loader
-def load_user(user_id):
-    user = User.query.get(user_id)
-    if user:
-        return user
-    else:
-        return None
+    def check_password(self, password):
+        return self.password == password
 
-admin.add_view(ModelView(User, db.session))
-admin.add_view(ModelView(Message, db.session))
-
-class MyModelView(ModelView):
-    def is_accessible(self):
-        return current_user.is_authenticated
-    def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for('login'))
+class UserAdminView(ModelView):
+    column_list = ['name', 'email', 'password']  
+    form_extra_fields = {
+        'password': PasswordField('Password', validators=[InputRequired()]), 
+        'email': EmailField('Email', validators=[InputRequired()])
+    }
     
-class MyAdminIndexView(AdminIndexView):
+class SecureModelView(ModelView):
     def is_accessible(self):
-        return current_user.is_authenticated
+        if "logged_in" in session:
+            return True
+        else:
+            abort(403) 
+   
+admin.add_view(SecureModelView(User, db.session, name='Пользователь'))
+admin.add_view(SecureModelView(Estate, db.session, name='Недвижимость'))
+admin.add_view(SecureModelView(Message, db.session, name='Заявки'))
 
-@app.route("/login")
+@app.route("/login", methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
- 
-@app.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    return 'Вы вышли из аккаунта!'
+    if request.method == "POST":
+        email = request.form.get('email')
+        password = request.form.get('password')
+        user = User.query.filter_by(email=email).first()
+        if user and user.check_password(password):  
+            session['logged_in'] = True
+            return redirect("/admin") 
+        else:
+            return redirect("/login?failed=True")  
+    else:
+        return render_template("admin/login.html")  
 
-@app.route("/home")
-@login_required
-def home():
-    return 'Администратор - ' + current_user.email
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login")
 
 @app.route("/") 
 def hello_dreamhouse(): 

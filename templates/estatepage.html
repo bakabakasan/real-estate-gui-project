@@ -4,22 +4,6 @@
 <head>
     <title>{{estate.type}} - DreamHouse</title>
     {% include 'bootstrap.html' %}   
-    <style>
-        .photos {
-            /* Стили для области с фотографиями */
-            /* Добавьте свои стили здесь */
-        }
-
-        .contact-form {
-            /* Стили для формы свяжитесь с нами */
-            /* Добавьте свои стили здесь */
-        }
-
-        .estate-info {
-            /* Стили для области с информацией о недвижимости */
-            /* Добавьте свои стили здесь */
-        }
-    </style>
 </head>
 
 <body>
@@ -30,13 +14,19 @@
             <div class="col-md-8">
                 <div class="photos">
                     <!-- Область с фотографиями -->
-                    <!-- Добавьте ваш код для фотографий здесь -->
+                    {% if estate.photo %}
+                    {% for photo in estate.photo.split(',') %}
+                    <img src="{{ photo }}" alt="Фото недвижимости">
+                    {% endfor %}
+                    {% else %}
+                    <p>Нет фотографий</p>
+                    {% endif %}
                 </div>
                 <div class="estate-info">
                     <h1 class="mb-2">{{estate.type}}</h1>
                     <p class="lead mt-0">{{estate.location}}</p>
                     <h4>Комнаты</h4>
-                    <p>{{estate.bedroom}}</p>
+                    <p>{{estate.bedrooms}}</p>
                     <h4>Стоимость</h4>
                     {% if estate['cost'] is not none %}
                     <p>{{estate.cost}} {{estate.currency}}</p>
