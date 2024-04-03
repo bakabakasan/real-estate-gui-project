@@ -1,21 +1,28 @@
+<style>
+  .img-responsive {
+    max-width: 100%;
+    height: auto;
+  }
+</style>
 <div class="border-bottom row" style="margin-bottom:16px; padding-bottom:4px">
-  <div class="col-10">
-    <h4 
-      style="color:rgb(120, 120, 120); margin-bottom:4px;">{{estate['type']}}
-    </h4>
-    <div>
-      <b>Местоположение:</b> {{estate['location']}} 
-    </div>
-    <div>
-      <b>Комнаты:</b> {{estate['bedroom']}}
-    </div>
-    {% if estate['cost'] is not none %}
-    <div>
-      <b>Стоимость:</b> {{estate['cost']}} {{estate['currency']}} 
-    </div>
-    {% endif %} 
-    </div>
-    <div class="col-2">
-        <a href="/estateitem/{{estate['id']}}" type="button" class="btn btn-outline-primary">Подробнее</a>
-    </div>
+  <div class="col-2">
+    {% if estate.photo %}
+    {% for photo_path in estate.photo.split(',') %}
+    <img src="{{ url_for('static', filename='uploads/' + photo_path) }}" class="img-responsive" alt="Фото недвижимости">
+    {% endfor %}
+    {% else %}
+    <p>Нет фотографий</p>
+    {% endif %}
+  </div>
+  <div class="col-8">
+    <h4 style="color:rgb(120, 120, 120); margin-bottom:4px;">{{ estate.type }}</h4>
+    <div><b>Местоположение:</b> {{ estate.location }}</div>
+    <div><b>Комнаты:</b> {{ estate.bedrooms }}</div>
+    {% if estate.cost is not none %}
+    <div><b>Стоимость:</b> {{ estate.cost }} {{ estate.currency }}</div>
+    {% endif %}
+  </div>
+  <div class="col-2 mt-2">
+    <a href="/estateitem/{{ estate.id }}" type="button" class="btn btn-outline-primary">Подробнее</a>
+  </div>
 </div>

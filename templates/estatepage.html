@@ -3,28 +3,34 @@
 
 <head>
     <title>{{estate.type}} - DreamHouse</title>
-    {% include 'bootstrap.html' %}   
+    {% include 'bootstrap.html' %}
+    <style>
+        .img-responsive {
+            max-width: 70%;
+            height: auto;
+        }
+    </style>
 </head>
-
 <body>
     {% include 'nav.html' %}
     {% include 'banner.html' %}
     <div class="container">
         <div class="row">
             <div class="col-md-8">
+            <div class="estate-info">
+                <h1 class="mb-2">{{estate.type}}</h1>
+                <p class="lead mt-0">{{estate.location}}</p>
+            </div>
                 <div class="photos">
-                    <!-- Область с фотографиями -->
                     {% if estate.photo %}
-                    {% for photo in estate.photo.split(',') %}
-                    <img src="{{ photo }}" alt="Фото недвижимости">
+                    {% for photo_path in estate.photo.split(',') %}
+                    <img src="{{ url_for('static', filename='uploads/' + photo_path) }}" class="img-responsive" alt="Фото недвижимости">
                     {% endfor %}
                     {% else %}
                     <p>Нет фотографий</p>
                     {% endif %}
                 </div>
                 <div class="estate-info">
-                    <h1 class="mb-2">{{estate.type}}</h1>
-                    <p class="lead mt-0">{{estate.location}}</p>
                     <h4>Комнаты</h4>
                     <p>{{estate.bedrooms}}</p>
                     <h4>Стоимость</h4>
@@ -49,8 +55,6 @@
             </div>
             <div class="col-md-4">
                 <div class="contact-form">
-                    <!-- Форма свяжитесь с нами -->
-                    <!-- Добавьте вашу форму здесь -->
                     {% include 'contactusform.html' %}
                 </div>
             </div>

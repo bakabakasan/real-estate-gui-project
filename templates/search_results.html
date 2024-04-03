@@ -2,16 +2,35 @@
 <html>
 
 <head>
+    {% include 'bootstrap.html' %}
     <title>Результаты поиска</title>
 </head>
 
 <body>
+    {% include 'nav.html' %}
+    {% include 'banner.html' %}
     <h1>Результаты поиска</h1>
-    <ul>
+    <div class="container">
         {% for result in results %}
-        <li>{{ result.description }}</li>
+        <div class="border-bottom row" style="margin-bottom:16px; padding-bottom:4px">
+            <div class="col-2">
+                <img src="{{ result.photo }}" class="img-fluid" alt="Изображение недвижимости">
+            </div>
+            <div class="col-8">
+                <h4 style="color:rgb(120, 120, 120); margin-bottom:4px;">{{ result.type }}</h4>
+                <div><b>Местоположение:</b> {{ result.location }}</div>
+                <div><b>Комнаты:</b> {{ result.bedrooms }}</div>
+                {% if result.cost %}
+                <div><b>Стоимость:</b> {{ result.cost }} {{ result.currency }}</div>
+                {% endif %}
+            </div>
+            <div class="col-2 mt-2 text-right">
+                <a href="/estateitem/{{ result.id }}" type="button" class="btn btn-outline-primary">Подробнее</a>
+            </div>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
+    {% include 'footer.html' %}
 </body>
 
 </html>

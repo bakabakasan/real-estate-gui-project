@@ -7,11 +7,14 @@ from dotenv import load_dotenv
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from wtforms import PasswordField, EmailField
+from flask_wtf.file import FileAllowed
 from flask_admin.form import FileUploadField
 from wtforms.validators import InputRequired
+from flask_migrate import Migrate
 
 load_dotenv() 
 app = Flask(__name__)
+
 
 db_host = os.environ.get('DB_HOST')
 db_name = os.environ.get('DB_NAME')
@@ -22,6 +25,7 @@ app.config["SECRET_KEY"] = "mysecret"
 
 db = SQLAlchemy(app)
 app.app_context().push()
+migrate = Migrate(app, db)
 
 try:
         db.session.execute(text("SELECT 1"))
@@ -62,9 +66,9 @@ class Estate(db.Model):
 
 class EstateAdminView(ModelView):
     form_extra_fields = {
-        'photo': FileUploadField('Photos', base_path='static/uploads/')
+        'photo': FileUploadField('Photos', validators=[FileAllowed(['jpg', 'png'])], base_path='static/uploads/')
     }
-              
+
 class Message(db.Model):
     __tablename__ = 'messages'
 
@@ -113,7 +117,7 @@ class SecureModelView(ModelView):
         if "logged_in" in session:
             return True
         else:
-            abort(403) 
+            return redirect(url_for('login')) 
    
 admin.add_view(SecureModelView(User, db.session, name='Пользователь'))
 admin.add_view(SecureModelView(Estate, db.session, name='Недвижимость'))
@@ -166,7 +170,7 @@ def list_estate():
     except Exception as e:
         return jsonify(error=str(e)), 500
     
-@app.route("/estateitem/<id>")
+@app.route("/estateitem/<int:id>")
 def show_estate(id):
     estate_item = Estate.query.get(id)
     if not estate_item:
@@ -175,11 +179,11 @@ def show_estate(id):
 
 def load_estateitem_from_db(id):
     try:
-        estate_item = Estate.query.get(id=id).first()
+        estate_item = Estate.query.get(id)
         if estate_item:
             return {
-               "id": estate_item.id, 
-               "type": estate_item.type,
+                "id": estate_item.id, 
+                "type": estate_item.type,
                 "location": estate_item.location,
                 "cost": estate_item.cost,
                 "currency": estate_item.currency,
@@ -187,13 +191,15 @@ def load_estateitem_from_db(id):
                 "area": estate_item.area,
                 "floor": estate_item.floor,
                 "description": estate_item.description,
-                "additional_information": estate_item.additional_information
+                "additional_information": estate_item.additional_information,
+                "photo": estate_item.photo  
             }
         else:
             return None
     except SQLAlchemyError as e:
         print("An error occurred while loading estate item from the database:", str(e))
         return None
+
 
 @app.route("/sent-message", methods=['POST'])
 def fill_in_the_form():
@@ -231,6 +237,25 @@ def contact_details():
 @app.route("/about-us") 
 def about_company(): 
     return render_template('aboutus.html')
-    
+
+@app.route('/search', methods=['GET'])
+def search():
+    bedrooms = request.args.get('bedrooms')
+    estate_type = request.args.get('type')
+    price_range = request.args.get('price_range')
+    results = perform_search(price_range, bedrooms, estate_type)
+    return render_template('search_results.html', results=results)
+
+def perform_search(price_range, bedroom, estate_type):
+    query = db.session.query(Estate)
+    if bedroom:
+        query = query.filter_by(bedrooms=bedroom)
+    if estate_type:
+        query = query.filter_by(type=estate_type)
+    if price_range:
+        min_price, max_price = map(int, price_range.split('-'))
+        query = query.filter(Estate.cost.between(min_price, max_price))
+    return query.all()
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
