@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, redirect, current_app, url_for, session, abort
+from flask import Flask, render_template, jsonify, request, redirect, current_app, session, abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import text
