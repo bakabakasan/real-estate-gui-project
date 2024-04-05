@@ -7,14 +7,13 @@ from dotenv import load_dotenv
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from wtforms import PasswordField, EmailField
-from flask_wtf.file import FileAllowed
-from flask_admin.form import FileUploadField
-from wtforms.validators import InputRequired
+from flask_admin.form.upload import FileUploadField
+from wtforms.validators import InputRequired, Email
 from flask_migrate import Migrate
+from sqlalchemy.orm import relationship
 
 load_dotenv() 
 app = Flask(__name__)
-
 
 db_host = os.environ.get('DB_HOST')
 db_name = os.environ.get('DB_NAME')
@@ -51,8 +50,10 @@ class Estate(db.Model):
     description = db.Column(db.Text())
     additional_information = db.Column(db.Text())
     photo = db.Column(db.Text())
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    users = relationship("User", back_populates="estate")
 
-    def __init__(self, type, location, cost=0.0, currency='USD', bedrooms=None, area=None, floor=None, description=None, additional_information=None, photo=None):
+    def __init__(self, type, location, cost=0.0, currency='USD', bedrooms=None, area=None, floor=None, description=None, additional_information=None, photo=None, user_id=None):
         self.type = type
         self.location = location
         self.cost = cost
@@ -63,12 +64,15 @@ class Estate(db.Model):
         self.description = description
         self.additional_information = additional_information
         self.photo = photo
+        self.user_id = user_id
 
 class EstateAdminView(ModelView):
+    column_list = ['id', 'type', 'location', 'cost', 'currency', 'bedrooms', 'area', 'floor', 'description', 'additional_information', 'photo', 'user_id']
+    form_columns = ['type', 'location', 'cost', 'currency', 'bedrooms', 'area', 'floor', 'description', 'additional_information', 'photo', 'user_id']
     form_extra_fields = {
-        'photo': FileUploadField('Photos', validators=[FileAllowed(['jpg', 'png'])], base_path='static/uploads/')
+        'photo': FileUploadField('Photos', base_path='static/uploads/')
     }
-
+    
 class Message(db.Model):
     __tablename__ = 'messages'
 
@@ -78,16 +82,20 @@ class Message(db.Model):
     email = db.Column(db.String(30))
     message = db.Column(db.Text())
     page_url = db.Column(db.String(200))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    users = relationship("User", back_populates="messages")
 
-    def __init__(self, full_name, phone_number, email, message, page_url):
+    def __init__(self, full_name, phone_number, email, message, page_url, user_id=None):
         self.full_name = full_name
         self.phone_number = phone_number
         self.email = email
         self.message = message
         self.page_url = page_url
+        self.user_id = user_id
 
-    def save_to_database(self):
-        pass
+class MessageAdminView(ModelView):
+    column_list = ['id', 'full_name', 'phone_number', 'email', 'message', 'page_url', 'user_id']
+    form_columns = ['id', 'full_name', 'phone_number', 'email', 'message', 'page_url', 'user_id']
     
 class User(db.Model):
     __tablename__ = 'users'
@@ -96,6 +104,8 @@ class User(db.Model):
     name = db.Column(db.String(60))
     email = db.Column(db.String(30))
     password = db.Column(db.String(128))
+    estate = relationship("Estate", back_populates="users")
+    messages = relationship("Message", back_populates="users")
 
     def __init__(self, name, email, password):
         self.name = name
@@ -106,22 +116,21 @@ class User(db.Model):
         return self.password == password
 
 class UserAdminView(ModelView):
-    column_list = ['name', 'email', 'password']  
+    column_list = ['id', 'name', 'email', 'password']  
     form_extra_fields = {
         'password': PasswordField('Password', validators=[InputRequired()]), 
-        'email': EmailField('Email', validators=[InputRequired()])
+        'email': EmailField('Email', validators=[InputRequired(), Email()])
     }
-    
-class SecureModelView(ModelView):
+
     def is_accessible(self):
         if "logged_in" in session:
             return True
         else:
-            return redirect(url_for('login')) 
+            abort(403)
    
-admin.add_view(SecureModelView(User, db.session, name='Пользователь'))
-admin.add_view(SecureModelView(Estate, db.session, name='Недвижимость'))
-admin.add_view(SecureModelView(Message, db.session, name='Заявки'))
+admin.add_view(UserAdminView(User, db.session, name='Пользователь'))
+admin.add_view(EstateAdminView(Estate, db.session, name='Недвижимость'))
+admin.add_view(MessageAdminView(Message, db.session, name='Заявки'))
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -146,7 +155,15 @@ def logout():
 def hello_dreamhouse(): 
     try:
         estate = Estate.query.all()
-        return render_template('home.html', estate=estate) 
+        page = request.args.get('page', 1, type=int)
+        per_page = 10
+        start = (page - 1) * per_page
+        end = start + per_page
+        total_pages = (len(estate) + per_page - 1) // per_page
+
+        estates_on_page = estate[start:end]
+
+        return render_template('home.html', estate=estate, estates_on_page=estates_on_page, total_pages=total_pages) 
     except Exception as e:
         return render_template('error.html', error=str(e)), 500
 
@@ -253,8 +270,11 @@ def perform_search(price_range, bedroom, estate_type):
     if estate_type:
         query = query.filter_by(type=estate_type)
     if price_range:
-        min_price, max_price = map(int, price_range.split('-'))
-        query = query.filter(Estate.cost.between(min_price, max_price))
+        if price_range == '200000-more':
+            query = query.filter(Estate.cost >= 200000)
+        else:
+            min_price, max_price = map(int, price_range.split('-'))
+            query = query.filter(Estate.cost.between(min_price, max_price))
     return query.all()
 
 if __name__ == "__main__":

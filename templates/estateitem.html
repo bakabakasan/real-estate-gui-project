@@ -8,7 +8,9 @@
   <div class="col-2">
     {% if estate.photo %}
     {% for photo_path in estate.photo.split(',') %}
-    <img src="{{ url_for('static', filename='uploads/' + photo_path) }}" class="img-responsive" alt="Фото недвижимости">
+    <a href="/estateitem/{{ estate.id }}">
+      <img src="{{ url_for('static', filename='uploads/' + photo_path) }}" class="img-responsive" alt="Фото недвижимости">
+    </a>
     {% endfor %}
     {% else %}
     <p>Нет фотографий</p>
@@ -25,4 +27,5 @@
   <div class="col-2 mt-2">
     <a href="/estateitem/{{ estate.id }}" type="button" class="btn btn-outline-primary">Подробнее</a>
   </div>
-</div>
+  </div>
+  

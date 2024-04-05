@@ -4,3 +4,6 @@ sqlalchemy
 flask-sqlalchemy
 psycopg2-binary
 python-dotenv
+flask-admin
+flask-wtf
+flask-migrate

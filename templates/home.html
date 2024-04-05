@@ -1,36 +1,76 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    {% include 'bootstrap.html' %}
-    <title>DreamHouse</title>
-  </head>
-  <body>
-    {% include 'nav.html' %}
-    {% include 'banner.html' %}
-    <div class="container">
-      <div class="row" style="margin-bottom:16px"> 
-        <div class="col-md-6"> 
-      
-      <p class="lead">
-        Добро пожаловать на DreamHouse - ваш партнер в мире недвижимости в Беларуси! Мы специализируемся на продаже домов и
-        квартир по всей стране, предлагая широкий выбор как вторичного жилья, так и новостроек. Наша компания объединяет в себе
-        профессиональных агентов, готовых помочь вам найти идеальное жилье, отвечающее вашим потребностям и предпочтениям.
-        Независимо от того, ищете ли вы уютный дом за городом или стильную квартиру в центре, DreamHouse поможет вам осуществить
-        вашу мечту о комфортном жилье в самом сердце Беларуси.
+
+<head>
+  {% include 'bootstrap.html' %}
+  <title>DreamHouse</title>
+  <style>
+    .pagination-container {
+      margin-top: 40px;
+      text-align: right;
+    }
+
+    .pagination-container a {
+      display: inline-block;
+      padding: 5px 10px;
+      margin-right: 5px;
+      font-size: 16px;
+      color: #336699;
+      text-decoration: none;
+      border: 1px solid #336699;
+      border-radius: 5px;
+    }
+
+    .pagination-container a:hover {
+      background-color: #336699;
+      color: #ffffff;
+    }
+  </style>
+</head>
+
+<body>
+  {% include 'nav.html' %}
+  {% include 'banner.html' %}
+  <div class="container">
+    <div class="row" style="margin-bottom:16px">
+      <div class="col-md-6">
+        <p class="lead">
+          Добро пожаловать на DreamHouse - ваш партнер в мире недвижимости в Беларуси! Мы специализируемся на продаже
+          домов и
+          квартир по всей стране, предлагая широкий выбор как вторичного жилья, так и новостроек. Наша компания
+          объединяет в себе
+          профессиональных агентов, готовых помочь вам найти идеальное жилье, отвечающее вашим потребностям и
+          предпочтениям.
+          Независимо от того, ищете ли вы уютный дом за городом или стильную квартиру в центре, DreamHouse поможет вам
+          осуществить
+          вашу мечту о комфортном жилье в самом сердце Беларуси.
         </p>
-       </div>
-        <div class="d-none d-md-block col-6">
-         <img src="/static/people.jpg" style="height:320px;border-radius:4px;">
-         </div>
       </div>
-        {% include 'search.html' %}
-        <div>
-          {% for estate in estate %}
-             {% include 'estateitem.html'%}
-          {% endfor%}
-        </div>
-        {% include 'contactusform.html' %}
+      <div class="d-none d-md-block col-6">
+        <img src="/static/people.jpg" style="height:320px;border-radius:4px;">
+      </div>
     </div>
-     {% include 'footer.html' %}
-  </body>
+    {% include 'search.html' %}
+
+    <div>
+      {% for estate in estates_on_page %}
+      {% include 'estateitem.html' %}
+      {% endfor %}
+    </div>
+
+    <div class="pagination-container">
+      {% if total_pages > 1 %}
+      {% for page_num in range(1, total_pages + 1) %}
+      <a href="?page={{ page_num }}">{{ page_num }}</a>
+      {% endfor %}
+      {% endif %}
+    </div>
+
+    <div>
+      {% include 'contactusform.html' %}
+    </div>
+  </div>
+  {% include 'footer.html' %}
+</body>
+
 </html>
