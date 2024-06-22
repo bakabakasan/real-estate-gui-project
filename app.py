@@ -12,7 +12,7 @@ from wtforms.validators import InputRequired, Email
 from flask_migrate import Migrate
 from sqlalchemy.orm import relationship
 
-load_dotenv() 
+load_dotenv()
 app = Flask(__name__)
 
 db_host = os.environ.get('DB_HOST')
@@ -27,14 +27,46 @@ app.app_context().push()
 migrate = Migrate(app, db)
 
 try:
-        db.session.execute(text("SELECT 1"))
-        print("Соединение с базой данных успешно установлено.")
-        db.create_all()
-        print("Таблицы успешно созданы.")
+    db.session.execute(text("SELECT 1"))
+    print("Соединение с базой данных успешно установлено.")
+    db.create_all()
+    print("Таблицы успешно созданы.")
 except SQLAlchemyError as e:
     print("Ошибка при соединении с базой данных:", str(e))
 
 admin = Admin(app, name="DreamHouse", template_mode="bootstrap3")
+
+class User(db.Model):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(60), nullable=False)
+    email = db.Column(db.String(30), unique=True, nullable=False)
+    password = db.Column(db.String(128), nullable=False)
+    estates = relationship("Estate", back_populates="user")
+
+    def __init__(self, name, email, password):
+        self.name = name
+        self.email = email
+        self.password = password
+
+    def check_password(self, password):
+        return self.password == password
+
+class Administrator(db.Model):
+    __tablename__ = 'administrators'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    full_name = db.Column(db.String(60), nullable=False)
+    email = db.Column(db.String(30), unique=True, nullable=False)
+    password = db.Column(db.String(128), nullable=False)
+    estates = relationship("Estate", back_populates="admin")
+    messages = relationship("Message", back_populates="admin")
+
+    def __init__(self, full_name, email, password):
+        self.full_name = full_name
+        self.email = email
+        self.password = password
 
 class Estate(db.Model):
     __tablename__ = 'estate'
@@ -51,9 +83,11 @@ class Estate(db.Model):
     additional_information = db.Column(db.Text())
     photo = db.Column(db.Text())
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    users = relationship("User", back_populates="estate")
+    admin_id = db.Column(db.Integer, db.ForeignKey('administrators.id'))
+    user = relationship("User", back_populates="estates")
+    admin = relationship("Administrator", back_populates="estates")
 
-    def __init__(self, type, location, cost=0.0, currency='USD', bedrooms=None, area=None, floor=None, description=None, additional_information=None, photo=None, user_id=None):
+    def __init__(self, type, location, cost=0.0, currency='USD', bedrooms=None, area=None, floor=None, description=None, additional_information=None, photo=None, user_id=None, admin_id=None):
         self.type = type
         self.location = location
         self.cost = cost
@@ -65,55 +99,27 @@ class Estate(db.Model):
         self.additional_information = additional_information
         self.photo = photo
         self.user_id = user_id
+        self.admin_id = admin_id
 
-class EstateAdminView(ModelView):
-    column_list = ['id', 'type', 'location', 'cost', 'currency', 'bedrooms', 'area', 'floor', 'description', 'additional_information', 'photo', 'user_id']
-    form_columns = ['type', 'location', 'cost', 'currency', 'bedrooms', 'area', 'floor', 'description', 'additional_information', 'photo', 'user_id']
-    form_extra_fields = {
-        'photo': FileUploadField('Photos', base_path='static/uploads/')
-    }
-    
 class Message(db.Model):
     __tablename__ = 'messages'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    full_name = db.Column(db.String(60))
-    phone_number = db.Column(db.String(20))
-    email = db.Column(db.String(30))
-    message = db.Column(db.Text())
-    page_url = db.Column(db.String(200))
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    users = relationship("User", back_populates="messages")
+    full_name = db.Column(db.String(60), nullable=False)
+    email = db.Column(db.String(30), nullable=False)
+    password = db.Column(db.String(128), nullable=False)
+    message = db.Column(db.Text(), nullable=False)
+    page_url = db.Column(db.String(200), nullable=False)
+    admin_id = db.Column(db.Integer, db.ForeignKey('administrators.id'))
+    admin = relationship("Administrator", back_populates="messages")
 
-    def __init__(self, full_name, phone_number, email, message, page_url, user_id=None):
+    def __init__(self, full_name, email, password, message, page_url, admin_id=None):
         self.full_name = full_name
-        self.phone_number = phone_number
-        self.email = email
-        self.message = message
-        self.page_url = page_url
-        self.user_id = user_id
-
-class MessageAdminView(ModelView):
-    column_list = ['id', 'full_name', 'phone_number', 'email', 'message', 'page_url', 'user_id']
-    form_columns = ['id', 'full_name', 'phone_number', 'email', 'message', 'page_url', 'user_id']
-    
-class User(db.Model):
-    __tablename__ = 'users'
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(60))
-    email = db.Column(db.String(30))
-    password = db.Column(db.String(128))
-    estate = relationship("Estate", back_populates="users")
-    messages = relationship("Message", back_populates="users")
-
-    def __init__(self, name, email, password):
-        self.name = name
         self.email = email
         self.password = password
-
-    def check_password(self, password):
-        return self.password == password
+        self.message = message
+        self.page_url = page_url
+        self.admin_id = admin_id
 
 class UserAdminView(ModelView):
     column_list = ['id', 'name', 'email', 'password']  
@@ -127,8 +133,33 @@ class UserAdminView(ModelView):
             return True
         else:
             abort(403)
-   
+
+class AdministratorAdminView(ModelView):
+    column_list = ['id', 'full_name', 'email', 'password']  
+    form_extra_fields = {
+        'password': PasswordField('Password', validators=[InputRequired()]), 
+        'email': EmailField('Email', validators=[InputRequired(), Email()])
+    }
+
+    def is_accessible(self):
+        if "logged_in" in session:
+            return True
+        else:
+            abort(403)
+
+class EstateAdminView(ModelView):
+    column_list = ['id', 'type', 'location', 'cost', 'currency', 'bedrooms', 'area', 'floor', 'description', 'additional_information', 'photo', 'user_id', 'admin_id']
+    form_columns = ['type', 'location', 'cost', 'currency', 'bedrooms', 'area', 'floor', 'description', 'additional_information', 'photo', 'user_id', 'admin_id']
+    form_extra_fields = {
+        'photo': FileUploadField('Photos', base_path='static/uploads/')
+    }
+
+class MessageAdminView(ModelView):
+    column_list = ['id', 'full_name', 'email', 'password', 'message', 'page_url', 'admin_id']
+    form_columns = ['full_name', 'email', 'password', 'message', 'page_url', 'admin_id']
+
 admin.add_view(UserAdminView(User, db.session, name='Пользователь'))
+admin.add_view(AdministratorAdminView(Administrator, db.session, name='Администратор'))
 admin.add_view(EstateAdminView(Estate, db.session, name='Недвижимость'))
 admin.add_view(MessageAdminView(Message, db.session, name='Заявки'))
 
