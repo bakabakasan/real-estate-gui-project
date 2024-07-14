@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% include 'bootstrap.html' %}
+    <title>Разместить объявление - DreamHouse</title>
+    <style>
+        .pagination-container {
+            margin-top: 40px;
+            text-align: right;
+        }
+
+        .pagination-container a {
+            display: inline-block;
+            padding: 5px 10px;
+            margin-right: 5px;
+            font-size: 16px;
+            color: #336699;
+            text-decoration: none;
+            border: 1px solid #336699;
+            border-radius: 5px;
+        }
+
+        .pagination-container a:hover {
+            background-color: #336699;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'nav.html' %}
+    {% include 'banner.html' %}
+<div class="container" style="background-color: #f0f8ff; padding: 20px;">
+    <h4 class="text-center mb-4">Разместите ваше объявление</h4>
+    <p class="lead text-center mb-4">
+        Заполните форму ниже, чтобы разместить на продажу вашу недвижимость. Наши менеджеры свяжутся с вами для
+        дальнейшей помощи и консультации.
+    </p>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            {% if message %}
+            <p class="message">{{ message | safe }}</p>
+            {% endif %}
+            <form action="/sent-message" method="post">
+                <div class="form-group">
+                    <label for="full_name">Имя</label>
+                    <input type="text" required class="form-control" id="full_name" name="full_name"
+                        placeholder="Введите ваше имя">
+                </div>
+                <div class="form-group">
+                    <label for="phone_number">Телефон</label>
+                    <input type="tel" required class="form-control" id="phone_number" name="phone_number"
+                        placeholder="Введите ваш телефон">
+                </div>
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" required class="form-control" id="email" name="email"
+                        placeholder="Введите ваш email">
+                </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group mb-4">
+                <label for="message">Сообщение</label>
+                <textarea class="form-control" id="message" name="message" placeholder="Какую недвижимость вы хотите продать?"></textarea>
+            </div>
+            <input type="hidden" name="page_url" value="{{ request.url }}">
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary" style="background-color: #4682b4;">Отправить</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% include 'footer.html' %}
+</body>
+
+</html>

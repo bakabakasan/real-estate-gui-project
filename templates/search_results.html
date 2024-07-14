@@ -44,6 +44,19 @@
             </div>
         </div>
         {% endfor %}
+
+        <!-- Пагинация -->
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                {% for page_num in range(1, total_pages + 1) %}
+                <li class="page-item {% if current_page == page_num %}active{% endif %}">
+                    <a class="page-link"
+                        href="{{ url_for('main.search', page=page_num, bedrooms=request.args.get('bedrooms'), type=request.args.get('type'), price_range=request.args.get('price_range')) }}">{{
+                        page_num }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
     </div>
     {% include 'footer.html' %}
 </body>

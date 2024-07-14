@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% include 'bootstrap.html' %}
+    <title>Редактировать профиль</title>
+    <style>
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            /* adjust based on your navbar height */
+            left: 0;
+            height: 100%;
+            width: 200px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #ddd;
+        }
+
+        .main-content {
+            margin-left: 220px;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'nav.html' %}
+    <div class="sidebar">
+        <h3>Меню</h3>
+        <a href="/user/profile/edit" class="btn btn-primary btn-block mb-2">Редактировать профиль</a>
+        <a href="/user/favorites" class="btn btn-secondary btn-block mb-2">Избранное</a>
+        <a href="/user/history" class="btn btn-secondary btn-block mb-2">История поиска</a>
+        <a href="/logout" class="btn btn-danger btn-block">Выход</a>
+    </div>
+    <div class="main-content">
+        <h1>Редактировать профиль</h1>
+        <form method="post" action="{{ url_for('main.edit_profile') }}">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.name.label(class="form-label") }}
+                {{ form.name(class="form-control") }}
+                {% if form.name.errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.name.errors %}
+                    <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(class="form-control") }}
+                {% if form.email.errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.email.errors %}
+                    <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.password.label(class="form-label") }}
+                {{ form.password(class="form-control") }}
+                {% if form.password.errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.password.errors %}
+                    <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.confirm_password.label(class="form-label") }}
+                {{ form.confirm_password(class="form-control") }}
+                {% if form.confirm_password.errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.confirm_password.errors %}
+                    <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        </form>
+        <a href="/user/profile" class="btn btn-secondary mt-2">Отменить</a>
+    </div>
+    {% include 'footer.html' %}
+</body>
+
+</html>
