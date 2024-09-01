@@ -3,10 +3,12 @@ from dotenv import load_dotenv
 from flask import Flask, g, session
 from models import User
 from models import db
-from routes import main_bp, admin
+from routes import main_bp
+from admin import admin
 from flask_migrate import Migrate
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
+from flask_babel import Babel
 
 load_dotenv()
 app = Flask(__name__)
@@ -19,9 +21,11 @@ db_username = os.environ.get('DB_USERNAME')
 app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://{db_username}:{db_password}@{db_host}/{db_name}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config["SECRET_KEY"] = "mysecret"
+app.config['BABEL_DEFAULT_LOCALE'] = 'ru'
 
 db.init_app(app)
 migrate = Migrate(app, db)
+babel = Babel(app)
 app.app_context().push()
 app.register_blueprint(main_bp)
 admin.init_app(app)

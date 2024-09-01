@@ -7,3 +7,5 @@ python-dotenv
 flask-admin
 flask-wtf
 flask-migrate
+flask-babel
+flask-babelEx

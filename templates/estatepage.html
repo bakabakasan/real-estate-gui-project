@@ -54,6 +54,8 @@
                     <p>Не указано.</p>
                     {% endif %}
                 </div>
+                {% if session.get('user_logged_in') and not session.get('admin_logged_in') %}
+                <!-- Если пользователь авторизован и не администратор -->
                 <div class="estate-actions mt-3">
                     {% if is_favorite %}
                     <form action="/remove_from_favorites/{{ estate.id }}" method="POST" id="remove-form">
@@ -65,10 +67,14 @@
                     </form>
                     {% endif %}
                 </div>
+                {% endif %}
             </div>
             <div class="col-md-4">
                 <div class="contact-form">
                     {% include 'contactusform.html' %}
+                </div>
+                <div id="map" class="container" style="background-color: #f0f8ff; padding: 20px;">
+
                 </div>
             </div>
         </div>

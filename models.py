@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
+from werkzeug.security import check_password_hash
 
 db = SQLAlchemy()
 
@@ -12,19 +13,19 @@ class User(db.Model):
     estates = relationship("Estate", back_populates="user")
 
     def check_password(self, password):
-        return self.password == password
+        return check_password_hash(self.password, password)
 
 class Administrator(db.Model):
     __tablename__ = 'administrators'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     full_name = db.Column(db.String(60), nullable=False)
     email = db.Column(db.String(30), unique=True, nullable=False)
-    password = db.Column(db.String(128), nullable=False)
+    password = db.Column(db.String(256), nullable=False)
     estates = relationship("Estate", back_populates="admin")
     messages = relationship("Message", back_populates="admin")
 
     def check_password(self, password):
-        return self.password == password
+        return check_password_hash(self.password, password)
 
 class Estate(db.Model):
     __tablename__ = 'estate'

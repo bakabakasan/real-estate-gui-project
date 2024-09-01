@@ -21,8 +21,8 @@
         </li>
       </ul>
       <ul class="navbar-nav ml-auto">
-        {% if current_user %}
-        <!-- Если пользователь авторизован -->
+        {% if session.get('user_logged_in') and not session.get('admin_logged_in') %}
+        <!-- Если пользователь авторизован и не администратор -->
         <li class="nav-item">
           <a class="nav-link" href="/user/favorites">
             Избранное
@@ -31,6 +31,13 @@
         <li class="nav-item">
           <a class="nav-link" href="/user/profile">
             Профиль
+          </a>
+        </li>
+        {% elif session.get('admin_logged_in') %}
+        <!-- Если администратор авторизован -->
+        <li class="nav-item">
+          <a class="nav-link" href="/admin">
+            Админ-панель
           </a>
         </li>
         {% else %}
