@@ -8,7 +8,7 @@ class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(60), nullable=False)
-    email = db.Column(db.String(30), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(256), nullable=False)
     estates = relationship("Estate", back_populates="user")
 
@@ -19,7 +19,7 @@ class Administrator(db.Model):
     __tablename__ = 'administrators'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     full_name = db.Column(db.String(60), nullable=False)
-    email = db.Column(db.String(30), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(256), nullable=False)
     estates = relationship("Estate", back_populates="admin")
     messages = relationship("Message", back_populates="admin")

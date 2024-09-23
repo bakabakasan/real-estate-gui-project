@@ -91,7 +91,7 @@ class AdministratorAdminView(ModelView):
     create_modal = True
     edit_modal = True
 
-    can_delete = False
+    can_delete = True
     can_create = True
     can_edit = True
     can_export = True
